@@ -147,7 +147,7 @@ app.use('/bookings', bookingRoutes);
 
 // Error handling
 // app.use(errorHandler);
-
-app.listen(process.env.PORT, () => {
+const PORT = process.env.PORT;
+app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 });
