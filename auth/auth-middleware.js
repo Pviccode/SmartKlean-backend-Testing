@@ -3,7 +3,7 @@ const logger = require('../config/logger');
 const { maskEmail } = require('../utils/otherUtils.js');
 
 // This authentication middleware ensures that only authenticated users (those with a valid JWT) can access protected routes.
-const auth = async (req, next) => {
+const auth = async (req, res, next) => {
     const token = req.cookies.auth_token;
     const { isValid, decoded} = verifyJwtToken(token);
 
