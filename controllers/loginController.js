@@ -118,7 +118,7 @@ const postLogin = [
             res.cookie("auth_token", token, { 
                 httpOnly: true,                                   // Prevents client-side JavaScript from accessing the cookie, reducing XSS attack risks.
                 secure: process.env.NODE_ENV === "production",   // Ensures the cookie is only sent over HTTPS in production (not in development).
-                sameSite: 'strict',                             // Prevent CSRF attacks
+                sameSite: 'none',                             // Prevent CSRF attacks
                 maxAge: 3600000,                               // Sets the cookie’s lifespan to 1 hour (3600000 milliseconds), matching the JWT’s expiration.
             });
 

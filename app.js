@@ -26,7 +26,7 @@ app.use(cookieParser());
 app.use(cors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   }
 ));
@@ -94,7 +94,7 @@ const csrfProtection = (req, res, next) => {
 }
 
 app.use((req, res, next) => {               // Apply CSRF protection to routes that need it (e.g., POST, PUT, DELETE)
-  if (['POST', 'PUT', 'DELETE'].includes(req.method)) {
+  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
     csrfProtection(req, res, next);
   } else {
     next();
@@ -126,7 +126,7 @@ try {
     res.cookie('_csrf', csrfToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'none',
     });
 
     console.log('Generated CSRF Token:', csrfToken, 'for Session ID:', sessionId);
