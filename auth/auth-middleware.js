@@ -3,25 +3,13 @@ const logger = require('../config/logger');
 const { maskEmail } = require('../utils/otherUtils.js');
 
 // This authentication middleware ensures that only authenticated users (those with a valid JWT) can access protected routes.
-const auth = async (req, res, next) => {
+const auth = async (req, next) => {
     const token = req.cookies.auth_token;
-    const { isValid, decoded, error} = verifyJwtToken(token);
+    const { isValid, decoded} = verifyJwtToken(token);
 
     if (!isValid) {
         req.user = null;
-        if (error === 'Expired token') {
-            req.tokenExpired = true;
-            return res.status(401).json({
-                isAuthenticated: false,
-                message: 'Token expired, please log in again',
-                user: null,
-            });
-        }
-        return res.status(error === 'No token provided' ? 401 : 500).json({
-            isAuthenticated: false,
-            message: error || 'Internal server error during authentication',
-            user: null
-        });
+        return next();           // Just move on without throwing an error
     }
 
     // If JWT token is valid, attaches the decoded JWT payload to the req object as req.user.

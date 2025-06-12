@@ -148,7 +148,7 @@ const getCurrentUser = [
         // Check if user is authenticated
         if (!req.user || !req.user.id) {
             logger.warn(`Unauthenticated user: for IP ${req.ip}`);
-            return res.status(401).json({ 
+            return res.json({ 
                 isAuthenticated: false,
                 message: 'Unauthenticated user: No valid user session', 
                 user: null 

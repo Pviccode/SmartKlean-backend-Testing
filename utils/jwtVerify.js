@@ -9,7 +9,6 @@ const verifyJwtToken = (token) => {
         return {
             isValid: false,
             decoded: null,
-            error: 'No token provided'
         };
     }
 
@@ -22,8 +21,7 @@ const verifyJwtToken = (token) => {
         
         return {
             isValid: true,
-            decoded,
-            error: null
+            decoded
         };
 
     } catch (error) {
@@ -33,7 +31,6 @@ const verifyJwtToken = (token) => {
             return {
                 isValid: false,
                 decoded: null,
-                error: 'Expired token'
             };
         }
 
@@ -42,7 +39,6 @@ const verifyJwtToken = (token) => {
         return {
             isValid: false,
             decoded: null,
-            error: 'Invalid token'
         };
     }
 };
