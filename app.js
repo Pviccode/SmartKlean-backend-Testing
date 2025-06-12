@@ -11,6 +11,7 @@ dotenv.config();
 
 // Custom modules
 const verifyJwtToken = require('./utils/jwtVerify.js');
+const { storeCsrfToken, getCsrfToken } = require('./utils/redis.js');
 const connectDB = require('./config/db.js');
 const authRoutes = require('./routes/authRoutes.js');
 const bookingRoutes = require('./routes/bookingRoutes.js');
@@ -27,7 +28,7 @@ app.use(cors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-csrf-token'],
   }
 ));
 
@@ -65,11 +66,8 @@ const getSessionIdentifier = (req, res) => {
   return sessionId;
 };
 
-// Store CSRF tokens in memory (replace with Redis or DB for production)
-const csrfTokens = new Map();
-
 // CSRF protection
-const csrfProtection = (req, res, next) => {
+const csrfProtection = async (req, res, next) => {
   const sessionId = getSessionIdentifier(req, res);
 
   // Skip CSRF check for safe methods
@@ -79,7 +77,7 @@ const csrfProtection = (req, res, next) => {
 
   // Check CSRF token for protected methods (POST, PUT, DELETE, etc.)
   const csrfToken = req.body._csrf || req.headers['x-csrf-token'];
-  const storedToken = csrfTokens.get(sessionId);
+  const storedToken = await getCsrfToken(sessionId);
 
   if (!csrfToken || csrfToken !== storedToken) {
     console.error('CSRF token validation failed:', { csrfToken, storedToken });
@@ -113,21 +111,13 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Route to expose CSRF token to frontend
-app.get('/csrf-token', (req, res) => {
+app.get('/csrf-token', async (req, res) => {
 try {
     const csrfToken = generateCsrfToken();
     const sessionId = getSessionIdentifier(req, res);
 
-    // Store token associated with session ID
-    csrfTokens.set(sessionId, csrfToken);
-    console.log('CSRF Token:', csrfToken);
-
-    // Set CSRF token as cookie
-    res.cookie('_csrf', csrfToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none',
-    });
+    // Store token in Redis with 1-hour expiration
+    await storeCsrfToken(sessionId, csrfToken);
 
     console.log('Generated CSRF Token:', csrfToken, 'for Session ID:', sessionId);
     return res.json({ csrfToken });
@@ -149,6 +139,7 @@ app.use('/bookings', bookingRoutes);
 
 // Error handling
 // app.use(errorHandler);
+
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
