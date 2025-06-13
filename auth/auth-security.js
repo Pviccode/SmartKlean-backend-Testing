@@ -9,7 +9,7 @@ const sanitizeInputs = (req, next) => {
         req.body = sanitize(req.body);
     }
     next();
-}
+};
 
 // Validation error middleware
 const handleValidationErrors = (req, res, next) => {

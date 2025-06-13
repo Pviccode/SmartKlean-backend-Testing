@@ -44,7 +44,7 @@ const validateResetPassword = [
 // Login user
 const postLogin = [
     requestRateLimiter(5, '/auth/login', 'login attempts'),
-    sanitizeInputs,
+    // sanitizeInputs,
     validateLogin,
     handleValidationErrors,
     async (req, res) => {

@@ -51,7 +51,7 @@ const validateResend = [
 // Register new user.
 exports.postSignup = [
     requestRateLimiter(5, '/auth/signup', 'signup attempts'),
-    sanitizeInputs,
+    // sanitizeInputs,
     validateSignup,
     handleValidationErrors,
     async (req, res) => {
@@ -82,11 +82,6 @@ exports.postSignup = [
                 lastName: lastName.trim(), 
                 email: email.toLowerCase(), 
                 password,
-                createdAt: new Date(),
-                lastFailedLogin: null,
-                lastLogin: null,
-                failedLoginAttempts: 0,
-                isVerified: false,
                 verificationToken,
                 verificationTokenExpires: tokenExpiration
             });
