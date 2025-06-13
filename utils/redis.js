@@ -6,6 +6,7 @@ const redisClient = redis.createClient({
 });
 
 redisClient.on('error', (err) => console.error('Redis Client Error:', err));
+redisClient.on('connect', () => console.log('Connected to Redis'));
 redisClient.connect();   // Connect to Redis
 
 const storeCsrfToken = async (sessionId, token) => {
